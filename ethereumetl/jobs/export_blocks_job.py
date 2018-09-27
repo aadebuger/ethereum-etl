@@ -82,9 +82,15 @@ class ExportBlocksJob(BaseJob):
     def _export_block(self, block):
         if self.export_blocks:
             self.item_exporter.export_item(self.block_mapper.block_to_dict(block))
+        print("block=",self.block_mapper.block_to_dict(block))
+        print("number=",self.block_mapper.block_to_dict(block)['number'])
+
         if self.export_transactions:
             for tx in block.transactions:
-                self.item_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
+#                print(self.transaction_mapper.transaction_to_dict(tx))
+                transactiondict = self.transaction_mapper.transaction_to_dict(tx)
+                transactiondict['timestamp']=self.block_mapper.block_to_dict(block)['timestamp']
+                self.item_exporter.export_item(transactiondict)
 
     def _end(self):
         self.batch_work_executor.shutdown()
